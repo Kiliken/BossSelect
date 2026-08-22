@@ -3,14 +3,15 @@
     {
       "name": "DevkitPro",
       "includePath": [
-		"C:/devkitPro/devkitARM/arm-none-eabi/include",
-		"C:/devkitPro/libgba/include",
-        "${workspaceFolder}/dep/include",
-        "${workspaceFolder}/source",
+		    "C:/devkitPro/devkitARM/arm-none-eabi/include",
+		    "C:/devkitPro/libgba/include",
+        "${workspaceFolder}/butano/include",
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/src",
         "${workspaceFolder}"
       ],
       "defines": [
-		"ARM7TDMI",
+		    "ARM7TDMI",
         "GBA"
       ],
       "compilerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-gcc.exe",
