@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "name": "DevkitPro",
+      "includePath": [
+		"C:/devkitPro/devkitARM/arm-none-eabi/include",
+		"C:/devkitPro/libgba/include",
+        "${workspaceFolder}/dep/include",
+        "${workspaceFolder}/source",
+        "${workspaceFolder}"
+      ],
+      "defines": [
+		"ARM7TDMI",
+        "GBA"
+      ],
+      "compilerPath": "C:/devkitPro/devkitARM/bin/arm-none-eabi-gcc.exe",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-gcc-arm"
+    }
+  ],
+  "version": 4
+}
