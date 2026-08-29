@@ -6,6 +6,8 @@
 #include "bn_sprite_items_character.h" 
 #include "bn_keypad.h"
 
+#include "Ship_Boss.h"
+
 int main()
 {
     // Initialize the Butano core system
@@ -16,6 +18,8 @@ int main()
 
     // Instantiate the sprite at X=0, Y=0
     bn::sprite_ptr character = bn::sprite_items::character.create_sprite(0, 0);
+
+    //ShipBoss testBoss(bn::sprite_items::character.create_sprite(0, 0));
 
     while(true)
     {
