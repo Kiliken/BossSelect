@@ -9,9 +9,21 @@
 
 #include "bn_sprite_ptr.h"
 
+
+
+
 class Boss {
 
 public:
+
+    enum class state
+    {
+        IDLE,
+        MOVING,
+        ATTACK
+    };
+
+
     virtual ~Boss() = default;
 
 
@@ -23,7 +35,7 @@ public:
 
 protected:
     Boss(const bn::sprite_ptr& sprite);
-    virtual void _update() = 0;
+    virtual void Update() = 0;
 
     [[nodiscard]] const bn::fixed_point& position() const
     {
@@ -35,7 +47,16 @@ protected:
         return _hitbox;
     }
 
+    [[nodiscard]] state getState() const
+    {
+        return _state;
+    }
+
+    void SetState(state toSetTo);
+
 private:
+    state _state;
+
     int _life;
     bn::fixed_point _position;
     bn::fixed_rect _hitbox;

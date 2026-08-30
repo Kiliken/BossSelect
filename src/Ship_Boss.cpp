@@ -5,6 +5,13 @@ ShipBoss::ShipBoss(const bn::sprite_ptr& sprite)
     
 }
 
-void ShipBoss::_update() {
-    
+void ShipBoss::Update() {
+    switch (getState())
+    {
+    case state::IDLE:
+        break;
+
+    default:
+        break;
+    }
 }

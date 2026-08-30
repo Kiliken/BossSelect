@@ -3,14 +3,14 @@
 
 #include "Boss.h"
 
-class ShipBoss : public Boss {
+class ShipBoss : Boss {
 
 public:
     ShipBoss(const bn::sprite_ptr& sprite);
     ~ShipBoss();
 
 private:
-    void _update() override;
+    void Update() override;
 };
 
 #endif
