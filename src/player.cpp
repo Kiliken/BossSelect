@@ -1,5 +1,7 @@
 #include "player.h"
 #include "bn_sprite_items_character.h"
+#include "bn_sprite_items_hitbox_h.h"
+#include "bn_sprite_items_hitbox_v.h"
 #include "bn_keypad.h"
 
 
@@ -28,9 +30,22 @@ void Player::update()
         if(bn::keypad::a_pressed()) 
         {
             _state = PlayerState::ATTACKING;
-            _attack_timer = 15; // Set attack duration to 15 frames (1/4th of a second)
+            _attack_timer = 15; 
             
-            // TODO: Spawn the sword sprite in the _facing_direction
+            // Create a visual debug sprite for the sword hitbox
+            bn::fixed_rect hitbox = get_sword_hitbox();
+            
+            // Spawn the horizontal or vertical sprite based on facing direction
+            if(_facing_direction == PlayerDirection::LEFT || _facing_direction == PlayerDirection::RIGHT)
+            {
+                _debug_hitbox_sprite = bn::sprite_items::hitbox_h.create_sprite(hitbox.x(), hitbox.y());
+            }
+            else
+            {
+                _debug_hitbox_sprite = bn::sprite_items::hitbox_v.create_sprite(hitbox.x(), hitbox.y());
+            }
+            
+            _debug_hitbox_sprite->set_blending_enabled(true); 
         }
     }
 }
@@ -68,7 +83,6 @@ void Player::handle_movement()
     if(bn::keypad::up_held())    { dy -= 1; }
     if(bn::keypad::down_held())  { dy += 1; }
 
-    // State & Direction updating
     if(dx == 0 && dy == 0)
     {
         _state = PlayerState::IDLE;
@@ -77,19 +91,42 @@ void Player::handle_movement()
     {
         _state = PlayerState::MOVING;
         
-        // Update facing direction based on input combinations
-        if(dx < 0 && dy < 0)      _facing_direction = PlayerDirection::UP_LEFT;
-        else if(dx > 0 && dy < 0) _facing_direction = PlayerDirection::UP_RIGHT;
-        else if(dx < 0 && dy > 0) _facing_direction = PlayerDirection::DOWN_LEFT;
-        else if(dx > 0 && dy > 0) _facing_direction = PlayerDirection::DOWN_RIGHT;
-        else if(dx < 0)           _facing_direction = PlayerDirection::LEFT;
-        else if(dx > 0)           _facing_direction = PlayerDirection::RIGHT;
-        else if(dy < 0)           _facing_direction = PlayerDirection::UP;
-        else if(dy > 0)           _facing_direction = PlayerDirection::DOWN;
+        // Prioritize Left/Right facing over Up/Down for diagonal inputs
+        if(dx < 0) {
+            _facing_direction = PlayerDirection::LEFT;
+        } else if(dx > 0) {
+            _facing_direction = PlayerDirection::RIGHT;
+        } else if(dy < 0) {
+            _facing_direction = PlayerDirection::UP;
+        } else if(dy > 0) {
+            _facing_direction = PlayerDirection::DOWN;
+        }
     }
 
     _sprite.set_x(_sprite.x() + dx);
     _sprite.set_y(_sprite.y() + dy);
+}
+
+
+bn::fixed_rect Player::get_sword_hitbox() const
+{
+    bn::fixed player_x = _sprite.x();
+    bn::fixed player_y = _sprite.y();
+
+    // Adjusted to match native 32x16 and 16x32 GBA sprite sizes
+    switch(_facing_direction)
+    {
+        case PlayerDirection::LEFT:
+            return bn::fixed_rect(player_x - 16, player_y, 32, 16);
+        case PlayerDirection::RIGHT:
+            return bn::fixed_rect(player_x + 16, player_y, 32, 16);
+        case PlayerDirection::UP:
+            return bn::fixed_rect(player_x, player_y - 16, 16, 32);
+        case PlayerDirection::DOWN:
+            return bn::fixed_rect(player_x, player_y + 16, 16, 32);
+        default:
+            return bn::fixed_rect(player_x, player_y, 16, 16);
+    }
 }
 
 
@@ -99,12 +136,19 @@ void Player::handle_attack()
     {
         _attack_timer--;
         
-        // TODO: Keep the sword hitbox active and process collisions
+        // Update the visual debug sprite's position just in case the player moves slightly (if you allow movement later)
+        if(_debug_hitbox_sprite)
+        {
+            bn::fixed_rect hitbox = get_sword_hitbox();
+            _debug_hitbox_sprite->set_position(hitbox.x(), hitbox.y());
+        }
     }
     else
     {
-        // Attack duration is over, return to idle state
         _state = PlayerState::IDLE;
+        
+        // Destroy the visual debug sprite by resetting the optional wrapper
+        _debug_hitbox_sprite.reset(); 
     }
 }
 
