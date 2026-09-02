@@ -4,12 +4,14 @@
 #include "bn_sprite_ptr.h"  // Allows us to create and manage the player's sprite
 #include "bn_fixed_rect.h"  // Allows us to define the player's collision rectangle
 #include "bn_optional.h"    // Allows us to create and destroy the sprite safely
+#include "bn_fixed.h"       // Added for fixed-point math
 
 // Track the player's current action
 enum class PlayerState {
     IDLE,
     MOVING,
-    ATTACKING
+    ATTACKING,
+    KNOCKED_BACK
 };
 
 // Track the movement facing direction
@@ -27,6 +29,11 @@ private:
     PlayerState _state = PlayerState::IDLE;
     PlayerDirection _facing_direction = PlayerDirection::DOWN;
     int _attack_timer = 0; // Counts down the frames of the attack
+
+    // Knockback tracking variables
+    int _knockback_timer = 0;
+    bn::fixed _knockback_dx = 0;
+    bn::fixed _knockback_dy = 0;
 
     // Optional debug sprite that only exists when attacking
     bn::optional<bn::sprite_ptr> _debug_hitbox_sprite;
@@ -48,6 +55,11 @@ public:
     // Gets the collision rectangle for the player's sword attack, used for collision detection
     bn::fixed_rect get_sword_hitbox() const;
 
+    bool is_attacking() const { return _state == PlayerState::ATTACKING; }
+
+    // for triggering knockback
+    void apply_knockback(bn::fixed dx, bn::fixed dy);
+
 private:
     // Handles player movement based on input
     void handle_movement();
@@ -57,6 +69,9 @@ private:
 
     // Handles invincibility frames and visual feedback
     void handle_invincibility();
+
+    // Handles knockback logic
+    void handle_knockback();
 };
 
 #endif // PLAYER_H

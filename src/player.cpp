@@ -16,11 +16,18 @@ void Player::update()
 {
     handle_invincibility();
 
-    if(_state == PlayerState::ATTACKING)
+    // Check if knocked back
+    if(_state == PlayerState::KNOCKED_BACK)
+    {
+        handle_knockback();
+    }
+    // If not knocked back, check if attacking
+    else if(_state == PlayerState::ATTACKING)
     {
         // Lock movement and process the attack animation/hitbox
         handle_attack();
     }
+    // Normal movement and input handling
     else
     {
         // Allow movement
@@ -163,5 +170,43 @@ void Player::handle_invincibility()
     else 
     {
         _sprite.set_visible(true); 
+    }
+}
+
+
+void Player::apply_knockback(bn::fixed dx, bn::fixed dy)
+{
+    // return early if already in knockback state
+    if(_state == PlayerState::KNOCKED_BACK)
+        return;
+        
+    _state = PlayerState::KNOCKED_BACK;
+    _knockback_timer = 15; // 15 frames of locked movement
+    _knockback_dx = dx;
+    _knockback_dy = dy;
+    
+    // Safety check: if player was attacking when hit, immediately destroy the hitbox
+    if(_debug_hitbox_sprite)
+    {
+        _debug_hitbox_sprite.reset();
+    }
+
+}
+
+
+void Player::handle_knockback()
+{
+    if(_knockback_timer > 0)
+    {
+        _knockback_timer--;
+        
+        // Push the player in the knockback direction
+        _sprite.set_x(_sprite.x() + _knockback_dx);
+        _sprite.set_y(_sprite.y() + _knockback_dy);
+    }
+    else
+    {
+        // Knockback finished, return control
+        _state = PlayerState::IDLE;
     }
 }
