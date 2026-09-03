@@ -19,7 +19,7 @@ int main()
     // Instantiate the sprite at X=0, Y=0
     bn::sprite_ptr character = bn::sprite_items::character.create_sprite(0, 0);
 
-    //ShipBoss testBoss(bn::sprite_items::character.create_sprite(0, 0));
+    ShipBoss testBoss(bn::sprite_items::character.create_sprite(0, 0));
 
     while(true)
     {
@@ -41,6 +41,8 @@ int main()
         {
             character.set_y(character.y() + 1);
         }
+
+        testBoss.Update();
 
         bn::core::update(); // Render the frame
     }

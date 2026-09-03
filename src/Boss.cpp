@@ -1,12 +1,15 @@
 #include "Boss.h"
 
-Boss::Boss(const bn::sprite_ptr &sprite)
+Boss::Boss(bn::sprite_ptr sprite)
+    :  _bossSpritePtr(sprite)
 {
-    _bossSprite = sprite;
+
 }
 
 void Boss::Update()
 {
+    bossSprite()->set_x(_position.x());
+    bossSprite()->set_y(_position.y());
 }
 
 void Boss::SetState(state toSetTo)
