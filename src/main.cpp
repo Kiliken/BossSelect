@@ -7,6 +7,7 @@
 #include "bn_random.h"                      // Added for random number generation
 
 #include "player.h" 
+#include "Ship_Boss.h"
 
 
 // --- Placeholder Enemy Class ---
@@ -40,6 +41,8 @@ int main()
     // Instantiate the player at X=0, Y=0
     Player player(0, 0); 
 
+    ShipBoss shipBoss(bn::sprite_items::character.create_sprite(0, 0)); // Placeholder sprite for the boss
+
     // Instantiate the test enemy slightly to the right (X=40, Y=0)
     Enemy enemy(40, 0);
 
@@ -47,6 +50,7 @@ int main()
     {
         // Run all player logic (movement, attacks, i-frames)
         player.update();
+        shipBoss.Update(); 
 
         // --- Knockback Test Trigger ---
         if(bn::keypad::l_pressed())

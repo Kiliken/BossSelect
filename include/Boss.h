@@ -10,6 +10,8 @@
 
 #include "bn_sprite_ptr.h"
 
+#include "bn_sprite_items_bullet.h"
+
 #include "utils.h"
 
 class Boss
@@ -51,18 +53,13 @@ protected:
     Boss(bn::sprite_ptr sprite);
     virtual void Update() = 0;
 
-    [[nodiscard]] bn::sprite_ptr *bossSprite()
-    {
-        return _bossSpritePtr.has_value() ? &_bossSpritePtr.value() : nullptr;
-    }
-
     state _state = state::IDLE;
 
     int _life;
     bn::fixed_point _position;
     bn::fixed_rect _hitbox;
 
-    bn::optional<bn::sprite_ptr> _bossSpritePtr;
+    bn::sprite_ptr _bossSprite;
 
 private:
 };

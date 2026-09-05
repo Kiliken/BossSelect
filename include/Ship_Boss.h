@@ -3,6 +3,10 @@
 
 #include "Boss.h"
 
+
+// Forward declarations
+class Bullet;
+
 class ShipBoss : Boss {
 
 public:
@@ -19,6 +23,7 @@ private:
     void HandleMoveState();
     void HandleAttackState();
 
+    void Shoot();
 
     void SetRandomDestination();
 
@@ -27,7 +32,7 @@ private:
 
     // State
     uint32_t _stateTimer = 0;
-    uint32_t _idleDuration = 360;
+    uint32_t _idleDuration = 30;
     bn::random _random;
 
     // Position
@@ -36,10 +41,12 @@ private:
 
     // Attack
     uint32_t _shotTimer = 0;
-    uint32_t _attackCooldown = 360;
-    uint32_t _timeBetweenShots = 120;
+    uint32_t _attackCooldown = 30;
+    uint32_t _timeBetweenShots = 20;
     int _bulletsFired = 0;
-    int _bulletsPerAttack = 0;
+    int _bulletsPerAttack = 7;
+
+    bn::vector<bn::unique_ptr<Bullet>, 10> _activeBullets;
 };
 
 #endif

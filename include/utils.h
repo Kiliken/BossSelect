@@ -8,6 +8,8 @@ namespace utils
 {
     namespace fixed{
         bn::fixed distance(const bn::fixed_point &p1, const bn::fixed_point &p2);
+
+        bn::fixed_point normalize(const bn::fixed_point &p);
     }
 }
 

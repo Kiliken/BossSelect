@@ -1,5 +1,7 @@
 #include "Ship_Boss.h"
 
+#include "Bullet.h"
+
 ShipBoss::ShipBoss(bn::sprite_ptr sprite)
     : Boss(sprite)
 {
@@ -22,6 +24,25 @@ void ShipBoss::Update()
         break;
     default:
         break;
+    }
+
+    bn::vector<bn::unique_ptr<Bullet>, 10>::iterator it = _activeBullets.begin();
+    while (it != _activeBullets.end())
+    {
+        bn::unique_ptr<Bullet>& bullet = *it;
+
+        // Update the bullet
+        bullet->Update();
+
+        // Check if it's off-screen and erase it, otherwise advance the iterator
+        if (bullet->IsOffScreen())
+        {
+            it = _activeBullets.erase(it); 
+        }
+        else
+        {
+            ++it;
+        }
     }
 }
 
@@ -63,8 +84,8 @@ void ShipBoss::HandleIdleState()
 
 void ShipBoss::SetRandomDestination()
 {
-    bn::fixed randomX = _random.get_fixed(-80,80);
-    bn::fixed randomY = _random.get_fixed(-80,80);
+    bn::fixed randomX = _random.get_fixed(-80, 80);
+    bn::fixed randomY = _random.get_fixed(-80, 80);
 
     _targetPosition.set_x(randomX);
     _targetPosition.set_y(randomY);
@@ -95,7 +116,8 @@ void ShipBoss::HandleAttackState()
 
     if (_shotTimer >= _timeBetweenShots && _bulletsFired < _bulletsPerAttack)
     {
-        // Shoot();
+        Shoot();
+
         _bulletsFired++;
         _shotTimer = 0; // Reset fire timer for the next bullet
     }
@@ -109,4 +131,15 @@ void ShipBoss::HandleAttackState()
             TransitionToState(state::MOVE);
         }
     }
+}
+
+void ShipBoss::Shoot()
+{
+    bn::fixed_point bulletDirection(_random.get_fixed(-1, 1), _random.get_fixed(-1, 1));
+
+    _activeBullets.push_back(bn::make_unique<Bullet>(
+        bn::sprite_items::bullet.create_sprite(_position.x(), _position.y()),
+        bulletDirection,
+        2
+        ));
 }
