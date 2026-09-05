@@ -7,7 +7,10 @@
 
 // Constructor
 Player::Player(int start_x, int start_y) : 
-    _sprite(bn::sprite_items::character.create_sprite(start_x, start_y)) 
+    _sprite(bn::sprite_items::character.create_sprite(start_x, start_y)),
+    // Initialize with Down-Walk frames (0, 1, 2, 3) running forever with a 10-frame delay
+    _anim_action(bn::create_sprite_animate_action_forever(
+        _sprite, 10, bn::sprite_items::character.tiles_item(), 0, 1, 2, 3)) 
 {
 }
 
@@ -55,6 +58,8 @@ void Player::update()
             _debug_hitbox_sprite->set_blending_enabled(true); 
         }
     }
+
+    update_animations();
 }
 
 
@@ -209,4 +214,39 @@ void Player::handle_knockback()
         // Knockback finished, return control
         _state = PlayerState::IDLE;
     }
+}
+
+
+void Player::update_animations()
+{
+    // Only update if the state or direction has changed
+    if(_state != _previous_state || _facing_direction != _previous_direction)
+    {
+        if(_state == PlayerState::MOVING)
+        {
+            switch(_facing_direction)
+            {
+                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 0, 1, 2, 3); break;
+                case PlayerDirection::UP:    _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 4, 5, 6, 7); break;
+                case PlayerDirection::LEFT:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 8, 9, 10, 11); break;
+                case PlayerDirection::RIGHT: _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 12, 13, 14, 15); break;
+            }
+        }
+        else if(_state == PlayerState::ATTACKING)
+        {
+            // Attack frames (e.g., indices 16 through 31)
+            // Use _once instead of _forever so the attack animation doesn't loop
+            switch(_facing_direction)
+            {
+                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_once(_sprite, 4, bn::sprite_items::character.tiles_item(), 16, 17, 18, 19); break;
+                // ... (Add UP, LEFT, RIGHT attack cases) ...
+            }
+        }
+        
+        _previous_state = _state;
+        _previous_direction = _facing_direction;
+    }
+
+    // Advance the animation by one frame
+    _anim_action.update(); 
 }
