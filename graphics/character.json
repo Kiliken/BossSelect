@@ -1,3 +1,4 @@
 {
-    "type": "sprite"
+    "type": "sprite",
+    "graphics": 32
 }
