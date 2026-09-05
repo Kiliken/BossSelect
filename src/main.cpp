@@ -1,49 +1,83 @@
-#include "bn_core.h"                        // Butano core functions
-#include "bn_regular_bg_ptr.h"              // regular background pointers
-#include "bn_regular_bg_items_testbg.h"     // the test background item
+#include "bn_core.h"
+#include "bn_regular_bg_ptr.h"
+#include "bn_regular_bg_items_testbg.h"
+#include "bn_sprite_items_character.h"      // Reusing the character sprite for the enemy
+#include "bn_log.h"                         // Required for printing messages
+#include "bn_keypad.h"                      // Added for the L button check
+#include "bn_random.h"                      // Added for random number generation
 
-#include "bn_sprite_ptr.h"
-#include "bn_sprite_items_character.h" 
-#include "bn_keypad.h"
+#include "player.h" 
 
-#include "Ship_Boss.h"
+
+// --- Placeholder Enemy Class ---
+class Enemy 
+{
+private:
+    bn::sprite_ptr _sprite;
+public:
+    Enemy(int start_x, int start_y) : 
+        _sprite(bn::sprite_items::character.create_sprite(start_x, start_y)) 
+    {
+    }
+
+    bn::fixed_rect get_collision_rect() const 
+    {
+        return bn::fixed_rect(_sprite.x(), _sprite.y(), 16, 16);
+    }
+};
+// -------------------------------
+
 
 int main()
 {
-    // Initialize the Butano core system
     bn::core::init();
 
-    // Instantiate the background at the X, Y coordinates (0, 0)
+    // Instantiate Butano's random generator
+    bn::random random;
+
     bn::regular_bg_ptr bg = bn::regular_bg_items::testbg.create_bg(0, 0);
 
-    // Instantiate the sprite at X=0, Y=0
-    bn::sprite_ptr character = bn::sprite_items::character.create_sprite(0, 0);
+    // Instantiate the player at X=0, Y=0
+    Player player(0, 0); 
 
-    ShipBoss testBoss(bn::sprite_items::character.create_sprite(0, 0));
+    // Instantiate the test enemy slightly to the right (X=40, Y=0)
+    Enemy enemy(40, 0);
 
     while(true)
     {
-        // Poll the D-pad for movement
-        if(bn::keypad::left_held())
-        {
-            character.set_x(character.x() - 1);
-        }
-        else if(bn::keypad::right_held())
-        {
-            character.set_x(character.x() + 1);
-        }
+        // Run all player logic (movement, attacks, i-frames)
+        player.update();
 
-        if(bn::keypad::up_held())
+        // --- Knockback Test Trigger ---
+        if(bn::keypad::l_pressed())
         {
-            character.set_y(character.y() - 1);
+            // Generate a random int between 0 and 4, then subtract 2 to get a range of [-2, 2]
+            bn::fixed random_dx = random.get_int(5) - 2;
+            bn::fixed random_dy = random.get_int(5) - 2;
+            
+            // Ensure they don't roll (0, 0) and just stand still
+            if(random_dx == 0 && random_dy == 0) { random_dx = 2; }
+
+            player.apply_knockback(random_dx, random_dy);
         }
-        else if(bn::keypad::down_held())
+        // -----------------------------
+
+        // --- Collision Check Logic ---
+        if(player.is_attacking())
         {
-            character.set_y(character.y() + 1);
+            // Get both bounding boxes
+            bn::fixed_rect sword_box = player.get_sword_hitbox();
+            bn::fixed_rect enemy_box = enemy.get_collision_rect();
+
+            // Check for AABB intersection
+            if(sword_box.intersects(enemy_box))
+            {
+                BN_LOG("Enemy hit");
+            }
         }
+        // -----------------------------
 
-        testBoss.Update();
-
-        bn::core::update(); // Render the frame
+        // Render the frame
+        bn::core::update(); 
     }
 }
