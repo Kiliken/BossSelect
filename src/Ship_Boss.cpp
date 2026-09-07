@@ -5,6 +5,8 @@
 ShipBoss::ShipBoss(bn::sprite_ptr sprite)
     : Boss(sprite)
 {
+
+    _life = 50;
 }
 
 void ShipBoss::Update()
@@ -44,6 +46,11 @@ void ShipBoss::Update()
             ++it;
         }
     }
+}
+
+void ShipBoss::TakeDamage(int damage){
+    Boss::TakeDamage(damage);
+
 }
 
 void ShipBoss::TransitionToState(state newState)

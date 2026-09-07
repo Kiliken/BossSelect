@@ -43,9 +43,6 @@ int main()
 
     ShipBoss shipBoss(bn::sprite_items::character.create_sprite(0, 0)); // Placeholder sprite for the boss
 
-    // Instantiate the test enemy slightly to the right (X=40, Y=0)
-    Enemy enemy(40, 0);
-
     while(true)
     {
         // Run all player logic (movement, attacks, i-frames)
@@ -69,14 +66,17 @@ int main()
         // --- Collision Check Logic ---
         if(player.is_attacking())
         {
+            bool thisAttack = true;
             // Get both bounding boxes
             bn::fixed_rect sword_box = player.get_sword_hitbox();
-            bn::fixed_rect enemy_box = enemy.get_collision_rect();
+            bn::fixed_rect enemy_box = shipBoss.hitbox();
 
             // Check for AABB intersection
-            if(sword_box.intersects(enemy_box))
+            if(sword_box.intersects(enemy_box) && thisAttack)
             {
-                BN_LOG("Enemy hit");
+                shipBoss.TakeDamage(5);
+                thisAttack = false;
+                BN_LOG("Boss life : %d", shipBoss.life());
             }
         }
         // -----------------------------

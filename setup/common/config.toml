@@ -37,12 +37,12 @@ force_rtc = true
 force_solar_sensor = false
 
 [video]
-filter = "nearest"
-color_correction = "agb"
+filter = "lcd1x"
+color_correction = "none"
 lcd_ghosting = true
 
 [window]
-scale = 2
+scale = 3
 fullscreen = false
 maximum_scale = 0
 fullscreen_show_menu = false

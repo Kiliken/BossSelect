@@ -7,13 +7,14 @@
 // Forward declarations
 class Bullet;
 
-class ShipBoss : Boss {
+class ShipBoss : public Boss {
 
 public:
     ShipBoss(bn::sprite_ptr sprite);
     ~ShipBoss() override = default;
 
     void Update() override;
+    void TakeDamage(int damage) override;
 private:
     
 

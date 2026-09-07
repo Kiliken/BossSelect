@@ -53,6 +53,8 @@ protected:
     Boss(bn::sprite_ptr sprite);
     virtual void Update() = 0;
 
+    virtual void TakeDamage(int damage) = 0;
+
     state _state = state::IDLE;
 
     int _life;

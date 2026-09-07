@@ -3,16 +3,23 @@
 Boss::Boss(bn::sprite_ptr sprite)
     :  _bossSprite(sprite)
 {
-
+    _hitbox = bn::fixed_rect{0,0,32,32};
 }
 
 void Boss::Update()
 {
     _bossSprite.set_x(_position.x());
     _bossSprite.set_y(_position.y());
+
+    _hitbox.set_position(_position.x(), _position.y());
 }
 
 void Boss::SetState(state toSetTo)
 {
     _state = toSetTo;
+}
+
+void Boss::TakeDamage(int damage)
+{
+    _life -= (damage <= _life ? damage : 0);
 }
