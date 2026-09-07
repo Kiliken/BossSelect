@@ -12,7 +12,6 @@ make -j8
 if %errorlevel% neq 0 (
 		color 0c
 		echo Build failed!
-		pause
 ) else (
 		color 0a
 		echo Build succeeded.

@@ -7,6 +7,7 @@
 #include "bn_random.h"                      // Added for random number generation
 
 #include "player.h" 
+#include "Ship_Boss.h"
 
 
 // --- Placeholder Enemy Class ---
@@ -40,13 +41,13 @@ int main()
     // Instantiate the player at X=0, Y=0
     Player player(0, 0); 
 
-    // Instantiate the test enemy slightly to the right (X=40, Y=0)
-    Enemy enemy(40, 0);
+    ShipBoss shipBoss(bn::sprite_items::character.create_sprite(0, 0)); // Placeholder sprite for the boss
 
     while(true)
     {
         // Run all player logic (movement, attacks, i-frames)
         player.update();
+        shipBoss.Update(); 
 
         // --- Knockback Test Trigger ---
         if(bn::keypad::l_pressed())
@@ -65,14 +66,17 @@ int main()
         // --- Collision Check Logic ---
         if(player.is_attacking())
         {
+            bool thisAttack = true;
             // Get both bounding boxes
             bn::fixed_rect sword_box = player.get_sword_hitbox();
-            bn::fixed_rect enemy_box = enemy.get_collision_rect();
+            bn::fixed_rect enemy_box = shipBoss.hitbox();
 
             // Check for AABB intersection
-            if(sword_box.intersects(enemy_box))
+            if(sword_box.intersects(enemy_box) && thisAttack)
             {
-                BN_LOG("Enemy hit");
+                shipBoss.TakeDamage(5);
+                thisAttack = false;
+                BN_LOG("Boss life : %d", shipBoss.life());
             }
         }
         // -----------------------------

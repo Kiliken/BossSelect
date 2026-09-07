@@ -14,16 +14,16 @@ hold_fast_forward = true
 fast_forward = [32, -1, -1, -1, 0]
 
 [input.gba]
-a = [65, -1, -1, -1, 0]
-r = [70, -1, -1, -1, 0]
-down = [16777237, -1, -1, -1, 0]
-right = [16777236, -1, -1, -1, 0]
+a = [74, -1, -1, -1, 0]
+r = [73, -1, -1, -1, 0]
+down = [83, -1, -1, -1, 0]
+right = [68, -1, -1, -1, 0]
 select = [16777219, -1, -1, -1, 0]
-b = [83, -1, -1, -1, 0]
+b = [75, -1, -1, -1, 0]
 start = [16777220, -1, -1, -1, 0]
-up = [16777235, -1, -1, -1, 0]
-left = [16777234, -1, -1, -1, 0]
-l = [68, -1, -1, -1, 0]
+up = [87, -1, -1, -1, 0]
+left = [65, -1, -1, -1, 0]
+l = [85, -1, -1, -1, 0]
 
 [general]
 bios_path = "gba_bios.bin"
@@ -37,12 +37,12 @@ force_rtc = true
 force_solar_sensor = false
 
 [video]
-filter = "nearest"
-color_correction = "agb"
+filter = "lcd1x"
+color_correction = "none"
 lcd_ghosting = true
 
 [window]
-scale = 2
+scale = 3
 fullscreen = false
 maximum_scale = 0
 fullscreen_show_menu = false
