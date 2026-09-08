@@ -37,6 +37,9 @@ int main()
 
     bn::regular_bg_ptr bg = bn::regular_bg_items::testbg.create_bg(0, 0);
 
+    // ***DEBUG for checking game over, remove or replace with proper game over logic later
+    bool game_over = false;
+
     // Instantiate the player at X=0, Y=0
     Player player(0, 0); 
 
@@ -45,37 +48,52 @@ int main()
 
     while(true)
     {
-        // Run all player logic (movement, attacks, i-frames)
-        player.update();
-
-        // --- Knockback Test Trigger ---
-        if(bn::keypad::l_pressed())
+        if(player.get_hp() > 0)
         {
-            // Generate a random int between 0 and 4, then subtract 2 to get a range of [-2, 2]
-            bn::fixed random_dx = random.get_int(5) - 2;
-            bn::fixed random_dy = random.get_int(5) - 2;
-            
-            // Ensure they don't roll (0, 0) and just stand still
-            if(random_dx == 0 && random_dy == 0) { random_dx = 2; }
+            // Run all player logic (movement, attacks, i-frames)
+            player.update();
 
-            player.apply_knockback(random_dx, random_dy);
-        }
-        // -----------------------------
+            // // --- Knockback Test Trigger ---
+            // if(bn::keypad::l_pressed())
+            // {
+            //     // Generate a random int between 0 and 4, then subtract 2 to get a range of [-2, 2]
+            //     bn::fixed random_dx = random.get_int(5) - 2;
+            //     bn::fixed random_dy = random.get_int(5) - 2;
+                
+            //     // Ensure they don't roll (0, 0) and just stand still
+            //     if(random_dx == 0 && random_dy == 0) { random_dx = 2; }
 
-        // --- Collision Check Logic ---
-        if(player.is_attacking())
-        {
-            // Get both bounding boxes
-            bn::fixed_rect sword_box = player.get_sword_hitbox();
-            bn::fixed_rect enemy_box = enemy.get_collision_rect();
+            //     player.apply_knockback(random_dx, random_dy);
+            // }
+            // // -----------------------------
 
-            // Check for AABB intersection
-            if(sword_box.intersects(enemy_box))
+            // // Game over test
+            // if(bn::keypad::l_pressed())
+            // {
+            //     player.take_damage(12);
+            // }
+
+            // --- Collision Check Logic ---
+            if(player.is_attacking())
             {
-                BN_LOG("Enemy hit");
+                // Get both bounding boxes
+                bn::fixed_rect sword_box = player.get_sword_hitbox();
+                bn::fixed_rect enemy_box = enemy.get_collision_rect();
+
+                // Check for AABB intersection
+                if(sword_box.intersects(enemy_box))
+                {
+                    BN_LOG("Enemy hit");
+                }
             }
+            // -----------------------------
         }
-        // -----------------------------
+        // GAME OVER CONDITION: If the player's HP is 0 or less, trigger game over
+        else if(!game_over)
+        {
+            BN_LOG("Player has been defeated!");
+            game_over = true;
+        }
 
         // Render the frame
         bn::core::update(); 
