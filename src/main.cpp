@@ -7,6 +7,7 @@
 #include "bn_random.h"                      // Added for random number generation
 
 #include "player.h" 
+#include "hud.h"
 
 
 // --- Placeholder Enemy Class ---
@@ -46,12 +47,17 @@ int main()
     // Instantiate the test enemy slightly to the right (X=40, Y=0)
     Enemy enemy(40, 0);
 
+    HUD hud;
+
     while(true)
     {
         if(player.get_hp() > 0)
         {
             // Run all player logic (movement, attacks, i-frames)
             player.update();
+
+            // Sync the HUD with the player's health
+            hud.update(player.get_hp());
 
             // // --- Knockback Test Trigger ---
             // if(bn::keypad::l_pressed())
@@ -67,11 +73,11 @@ int main()
             // }
             // // -----------------------------
 
-            // // Game over test
-            // if(bn::keypad::l_pressed())
-            // {
-            //     player.take_damage(12);
-            // }
+            // damage test
+            if(bn::keypad::l_pressed())
+            {
+                player.take_damage(4);
+            }
 
             // --- Collision Check Logic ---
             if(player.is_attacking())
@@ -91,6 +97,9 @@ int main()
         // GAME OVER CONDITION: If the player's HP is 0 or less, trigger game over
         else if(!game_over)
         {
+            // Force the HUD to update one last time to show 0 hearts
+            hud.update(0);
+
             BN_LOG("Player has been defeated!");
             game_over = true;
         }
