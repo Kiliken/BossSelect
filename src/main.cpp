@@ -1,33 +1,32 @@
 #include "bn_core.h"
 #include "bn_regular_bg_ptr.h"
 #include "bn_regular_bg_items_testbg.h"
-#include "bn_sprite_items_character.h"      // Reusing the character sprite for the enemy
-#include "bn_log.h"                         // Required for printing messages
-#include "bn_keypad.h"                      // Added for the L button check
-#include "bn_random.h"                      // Added for random number generation
+#include "bn_sprite_items_character.h" // Reusing the character sprite for the enemy
+#include "bn_log.h"                    // Required for printing messages
+#include "bn_keypad.h"                 // Added for the L button check
+#include "bn_random.h"                 // Added for random number generation
 
-#include "player.h" 
+#include "player.h"
 #include "hud.h"
-
+#include "Ship_Boss.h"
 
 // --- Placeholder Enemy Class ---
-class Enemy 
+class Enemy
 {
 private:
     bn::sprite_ptr _sprite;
+
 public:
-    Enemy(int start_x, int start_y) : 
-        _sprite(bn::sprite_items::character.create_sprite(start_x, start_y)) 
+    Enemy(int start_x, int start_y) : _sprite(bn::sprite_items::character.create_sprite(start_x, start_y))
     {
     }
 
-    bn::fixed_rect get_collision_rect() const 
+    bn::fixed_rect get_collision_rect() const
     {
         return bn::fixed_rect(_sprite.x(), _sprite.y(), 16, 16);
     }
 };
 // -------------------------------
-
 
 int main()
 {
@@ -42,16 +41,17 @@ int main()
     bool game_over = false;
 
     // Instantiate the player at X=0, Y=0
-    Player player(0, 0); 
+    Player player(0, 0);
 
-    // Instantiate the test enemy slightly to the right (X=40, Y=0)
-    Enemy enemy(40, 0);
+    // Instantiate the test boss slightly to the right (X=40, Y=0)
+    ShipBoss shipBoss(bn::sprite_items::character.create_sprite(40, 0));
+
 
     HUD hud;
 
-    while(true)
+    while (true)
     {
-        if(player.get_hp() > 0)
+        if (player.get_hp() > 0)
         {
             // Run all player logic (movement, attacks, i-frames)
             player.update();
@@ -65,7 +65,7 @@ int main()
             //     // Generate a random int between 0 and 4, then subtract 2 to get a range of [-2, 2]
             //     bn::fixed random_dx = random.get_int(5) - 2;
             //     bn::fixed random_dy = random.get_int(5) - 2;
-                
+
             //     // Ensure they don't roll (0, 0) and just stand still
             //     if(random_dx == 0 && random_dy == 0) { random_dx = 2; }
 
@@ -74,28 +74,31 @@ int main()
             // // -----------------------------
 
             // damage test
-            if(bn::keypad::l_pressed())
+            if (bn::keypad::l_pressed())
             {
                 player.take_damage(4);
             }
 
             // --- Collision Check Logic ---
-            if(player.is_attacking())
+            if (player.is_attacking())
             {
+                bool thisAttack = true;
                 // Get both bounding boxes
                 bn::fixed_rect sword_box = player.get_sword_hitbox();
-                bn::fixed_rect enemy_box = enemy.get_collision_rect();
+                bn::fixed_rect enemy_box = shipBoss.hitbox();
 
                 // Check for AABB intersection
-                if(sword_box.intersects(enemy_box))
+                if (sword_box.intersects(enemy_box) && thisAttack)
                 {
-                    BN_LOG("Enemy hit");
+                    shipBoss.TakeDamage(5);
+                    thisAttack = false;
+                    BN_LOG("Boss life : %d", shipBoss.life());
                 }
             }
             // -----------------------------
         }
         // GAME OVER CONDITION: If the player's HP is 0 or less, trigger game over
-        else if(!game_over)
+        else if (!game_over)
         {
             // Force the HUD to update one last time to show 0 hearts
             hud.update(0);
@@ -105,6 +108,6 @@ int main()
         }
 
         // Render the frame
-        bn::core::update(); 
+        bn::core::update();
     }
 }
