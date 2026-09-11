@@ -58,6 +58,21 @@ public:
 
     void update();
     
+    bn::fixed_point position() const
+    {
+        return _sprite.position();
+    }
+
+    void set_position(bn::fixed x, bn::fixed y)
+    {
+        _sprite.set_position(x, y);
+    }
+
+    bn::sprite_ptr& sprite()
+    {
+        return _sprite;
+    }
+
     // Handles taking damage and invincibility frames
     void take_damage(int amount);
 
@@ -74,6 +89,8 @@ public:
 
     // for triggering knockback
     void apply_knockback(bn::fixed dx, bn::fixed dy);
+
+    
 
 private:
     // Handles player movement based on input
