@@ -24,6 +24,11 @@ void Player::update()
     {
         handle_knockback();
     }
+    // Check if dashing
+    else if(_state == PlayerState::DASHING)
+    {
+        handle_dash();
+    }
     // If not knocked back, check if attacking
     else if(_state == PlayerState::ATTACKING)
     {
@@ -36,26 +41,49 @@ void Player::update()
         // Allow movement
         handle_movement();
         
+        // Listen for the dash input (mapped to B button)
+        if(bn::keypad::b_pressed())
+        {
+            // Calculate dash vector based on current input
+            int dx = 0;
+            int dy = 0;
+            if(bn::keypad::left_held())  { dx -= 1; }
+            if(bn::keypad::right_held()) { dx += 1; }
+            if(bn::keypad::up_held())    { dy -= 1; }
+            if(bn::keypad::down_held())  { dy += 1; }
+
+            // Only trigger dash if the player is actively pressing a direction
+            if(dx != 0 || dy != 0) 
+            {
+                _state = PlayerState::DASHING;
+                _dash_timer = 12;         // Dash duration
+                _dash_dx = dx * 3;        // Dash speed multiplier (3 pixels per frame)
+                _dash_dy = dy * 3;
+            }
+        }
         // Listen for the attack input (mapped to A button)
-        if(bn::keypad::a_pressed()) 
+        else if(bn::keypad::a_pressed()) 
         {
             _state = PlayerState::ATTACKING;
-            _attack_timer = 15; 
+            _attack_timer = 16; 
             
             // Create a visual debug sprite for the sword hitbox
             bn::fixed_rect hitbox = get_sword_hitbox();
-            
-            // Spawn the horizontal or vertical sprite based on facing direction
-            if(_facing_direction == PlayerDirection::LEFT || _facing_direction == PlayerDirection::RIGHT)
+
+            if(_debug_hitbox_visible)
             {
-                _debug_hitbox_sprite = bn::sprite_items::hitbox_h.create_sprite(hitbox.x(), hitbox.y());
+                // Spawn the horizontal or vertical sprite based on facing direction
+                if(_facing_direction == PlayerDirection::LEFT || _facing_direction == PlayerDirection::RIGHT)
+                {
+                    _debug_hitbox_sprite = bn::sprite_items::hitbox_h.create_sprite(hitbox.x(), hitbox.y());
+                }
+                else
+                {
+                    _debug_hitbox_sprite = bn::sprite_items::hitbox_v.create_sprite(hitbox.x(), hitbox.y());
+                }
+                
+                _debug_hitbox_sprite->set_blending_enabled(true); 
             }
-            else
-            {
-                _debug_hitbox_sprite = bn::sprite_items::hitbox_v.create_sprite(hitbox.x(), hitbox.y());
-            }
-            
-            _debug_hitbox_sprite->set_blending_enabled(true); 
         }
     }
 
@@ -199,6 +227,24 @@ void Player::apply_knockback(bn::fixed dx, bn::fixed dy)
 }
 
 
+void Player::handle_dash()
+{
+    if(_dash_timer > 0)
+    {
+        _dash_timer--;
+        
+        // Move the player at the increased dash speed
+        _sprite.set_x(_sprite.x() + _dash_dx);
+        _sprite.set_y(_sprite.y() + _dash_dy);
+    }
+    else
+    {
+        // Dash finished, return control
+        _state = PlayerState::IDLE;
+    }
+}
+
+
 void Player::handle_knockback()
 {
     if(_knockback_timer > 0)
@@ -222,24 +268,41 @@ void Player::update_animations()
     // Only update if the state or direction has changed
     if(_state != _previous_state || _facing_direction != _previous_direction)
     {
-        if(_state == PlayerState::MOVING)
+        if(_state == PlayerState::MOVING || _state == PlayerState::DASHING)
         {
+            // Walking frames
+            // Use _forever so the walking animation loops
             switch(_facing_direction)
             {
-                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 0, 1, 2, 3); break;
-                case PlayerDirection::UP:    _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 4, 5, 6, 7); break;
+                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 4, 5, 6, 7); break;
+                case PlayerDirection::UP:    _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 0, 1, 2, 3); break;
                 case PlayerDirection::LEFT:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 8, 9, 10, 11); break;
                 case PlayerDirection::RIGHT: _anim_action = bn::create_sprite_animate_action_forever(_sprite, 10, bn::sprite_items::character.tiles_item(), 12, 13, 14, 15); break;
+                default: break;
             }
         }
         else if(_state == PlayerState::ATTACKING)
         {
-            // Attack frames (e.g., indices 16 through 31)
+            // Attack frames
             // Use _once instead of _forever so the attack animation doesn't loop
             switch(_facing_direction)
             {
-                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_once(_sprite, 4, bn::sprite_items::character.tiles_item(), 16, 17, 18, 19); break;
-                // ... (Add UP, LEFT, RIGHT attack cases) ...
+                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_once(_sprite, 4, bn::sprite_items::character.tiles_item(), 20, 21, 22, 23); break;
+                case PlayerDirection::UP:    _anim_action = bn::create_sprite_animate_action_once(_sprite, 4, bn::sprite_items::character.tiles_item(), 16, 17, 18, 19); break;
+                case PlayerDirection::LEFT:  _anim_action = bn::create_sprite_animate_action_once(_sprite, 4, bn::sprite_items::character.tiles_item(), 24, 25, 26, 27); break;
+                case PlayerDirection::RIGHT: _anim_action = bn::create_sprite_animate_action_once(_sprite, 4, bn::sprite_items::character.tiles_item(), 28, 29, 30, 31); break;
+                default: break;
+            }
+        }
+        else if(_state == PlayerState::IDLE || _state == PlayerState::KNOCKED_BACK)
+        {
+            switch(_facing_direction)
+            {
+                case PlayerDirection::DOWN:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 1, bn::sprite_items::character.tiles_item(), 4, 4, 4, 4); break;
+                case PlayerDirection::UP:    _anim_action = bn::create_sprite_animate_action_forever(_sprite, 1, bn::sprite_items::character.tiles_item(), 0, 0, 0, 0); break;
+                case PlayerDirection::LEFT:  _anim_action = bn::create_sprite_animate_action_forever(_sprite, 1, bn::sprite_items::character.tiles_item(), 8, 8, 8, 8); break;
+                case PlayerDirection::RIGHT: _anim_action = bn::create_sprite_animate_action_forever(_sprite, 1, bn::sprite_items::character.tiles_item(), 12, 12, 12, 12); break;
+                default: break;
             }
         }
         
@@ -247,6 +310,9 @@ void Player::update_animations()
         _previous_direction = _facing_direction;
     }
 
-    // Advance the animation by one frame
-    _anim_action.update(); 
+    // Advance the animation by one frame, but only if it isn't finished
+    if(!_anim_action.done())
+    {
+        _anim_action.update(); 
+    } 
 }

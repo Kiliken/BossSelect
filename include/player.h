@@ -12,7 +12,8 @@ enum class PlayerState {
     IDLE,
     MOVING,
     ATTACKING,
-    KNOCKED_BACK
+    KNOCKED_BACK,
+    DASHING
 };
 
 // Track the movement facing direction
@@ -36,13 +37,19 @@ private:
     bn::fixed _knockback_dx = 0;
     bn::fixed _knockback_dy = 0;
 
+    // Dash tracking variables
+    int _dash_timer = 0;
+    bn::fixed _dash_dx = 0;
+    bn::fixed _dash_dy = 0;
+
     // Optional debug sprite that only exists when attacking
     bn::optional<bn::sprite_ptr> _debug_hitbox_sprite;
+    bool _debug_hitbox_visible = false; // Track visibility of the debug hitbox sprite
 
     // Animations
     bn::sprite_animate_action<4> _anim_action;
     PlayerState _previous_state = PlayerState::IDLE;
-    PlayerDirection _previous_direction = PlayerDirection::DOWN;
+    PlayerDirection _previous_direction = PlayerDirection::UP;
 
 
 
@@ -80,6 +87,9 @@ private:
 
     // Handles knockback logic
     void handle_knockback();
+
+    // Handles dash logic
+    void handle_dash();
 
     // Handles animation logic
     void update_animations();
