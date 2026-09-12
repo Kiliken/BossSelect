@@ -11,6 +11,7 @@
 #include "bn_sprite_ptr.h"
 
 #include "bn_sprite_items_bullet.h"
+#include "bn_camera_ptr.h"
 
 #include "utils.h"
 
@@ -50,7 +51,7 @@ public:
     void SetState(state toSetTo);
 
 protected:
-    Boss(bn::sprite_ptr sprite);
+    Boss(bn::sprite_ptr sprite, bn::camera_ptr camera);
     virtual void Update() = 0;
 
     virtual void TakeDamage(int damage) = 0;
@@ -62,6 +63,7 @@ protected:
     bn::fixed_rect _hitbox;
 
     bn::sprite_ptr _bossSprite;
+    bn::camera_ptr _camera;
 
 private:
 };

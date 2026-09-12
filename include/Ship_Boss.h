@@ -12,7 +12,7 @@ class MapManager;
 class ShipBoss : public Boss {
 
 public:
-    ShipBoss(bn::sprite_ptr sprite, MapManager* map);
+    ShipBoss(bn::sprite_ptr sprite, bn::camera_ptr camera);
     ~ShipBoss() override = default;
 
     void Update() override;

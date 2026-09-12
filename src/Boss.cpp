@@ -1,8 +1,9 @@
 #include "Boss.h"
 
-Boss::Boss(bn::sprite_ptr sprite)
-    :  _bossSprite(sprite)
+Boss::Boss(bn::sprite_ptr sprite, bn::camera_ptr camera)
+    :  _bossSprite(sprite), _camera(camera)
 {
+    _bossSprite.set_camera(camera);
     _hitbox = bn::fixed_rect{0,0,16,16};
 }
 

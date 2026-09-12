@@ -1,10 +1,5 @@
 #include "Bullet.h"
 
-Bullet::Bullet(bn::sprite_ptr sprite, bn::fixed_point direction, bn::fixed speed)
-    : _sprite(sprite), _direction(direction), _speed(speed)
-{
-}
-
 void Bullet::Update()
 {
     // Move the bullet in the specified direction

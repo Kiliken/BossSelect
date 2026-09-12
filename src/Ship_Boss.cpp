@@ -3,8 +3,8 @@
 #include "Bullet.h"
 #include "MapManager.h"
 
-ShipBoss::ShipBoss(bn::sprite_ptr sprite, MapManager* map)
-    : Boss(sprite), _map(map)
+ShipBoss::ShipBoss(bn::sprite_ptr sprite, bn::camera_ptr camera)
+    : Boss(sprite,camera)
 {
 
     _life = 50;
@@ -162,7 +162,7 @@ void ShipBoss::Shoot()
     _activeBullets.push_back(bn::make_unique<Bullet>(
         bn::sprite_items::bullet.create_sprite(_position.x(), _position.y()),
         bulletDirection,
-        2));
+        2, _camera));
 }
 
 void ShipBoss::HandleImmuneState()
