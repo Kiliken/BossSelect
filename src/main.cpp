@@ -49,7 +49,7 @@ int main()
     player.sprite().set_camera(camera);
 
     // Instantiate the test boss slightly to the right (X=40, Y=0)
-    ShipBoss shipBoss(bn::sprite_items::character.create_sprite(40, 0));
+    ShipBoss shipBoss(bn::sprite_items::character.create_sprite(), &map_manager);
 
     HUD hud;
 

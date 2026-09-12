@@ -4,13 +4,15 @@
 #include "Boss.h"
 
 
+
 // Forward declarations
 class Bullet;
+class MapManager;
 
 class ShipBoss : public Boss {
 
 public:
-    ShipBoss(bn::sprite_ptr sprite);
+    ShipBoss(bn::sprite_ptr sprite, MapManager* map);
     ~ShipBoss() override = default;
 
     void Update() override;
@@ -40,6 +42,7 @@ private:
     // Position
     bn::fixed_point _targetPosition;
     bn::fixed _speed = 2;
+    MapManager* _map;
 
     // Attack
     uint32_t _shotTimer = 0;

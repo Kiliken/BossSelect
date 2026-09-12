@@ -1,12 +1,15 @@
 #include "Ship_Boss.h"
 
 #include "Bullet.h"
+#include "MapManager.h"
 
-ShipBoss::ShipBoss(bn::sprite_ptr sprite)
-    : Boss(sprite)
+ShipBoss::ShipBoss(bn::sprite_ptr sprite, MapManager* map)
+    : Boss(sprite), _map(map)
 {
 
     _life = 50;
+    _position.set_x(60);
+    _position.set_y(60);
 }
 
 void ShipBoss::Update()
@@ -104,7 +107,7 @@ void ShipBoss::HandleIdleState()
 void ShipBoss::SetRandomDestination()
 {
     bn::fixed randomX = _random.get_fixed(-80, 80);
-    bn::fixed randomY = _random.get_fixed(-80, 80);
+    bn::fixed randomY = _random.get_fixed(-60,60);
 
     _targetPosition.set_x(randomX);
     _targetPosition.set_y(randomY);
