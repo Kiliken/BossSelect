@@ -417,3 +417,39 @@ bn::fixed_point MapManager::constrain_player(
 
     return bn::fixed_point(x, y);
 }
+
+bn::fixed MapManager::map_left() const
+{
+    if(_current_map == MapID::CENTER)
+    {
+        return -120;
+    }
+    return -128;
+}
+
+bn::fixed MapManager::map_right() const
+{
+    if(_current_map == MapID::CENTER)
+    {
+        return -120;
+    }
+    return -128;
+}
+
+bn::fixed MapManager::map_top() const
+{
+    if(_current_map == MapID::CENTER)
+    {
+        return -80;
+    }
+    return -128;
+}
+
+bn::fixed MapManager::map_bottom() const
+{
+    if(_current_map == MapID::CENTER)
+    {
+        return 80;
+    }
+    return -128;
+}
