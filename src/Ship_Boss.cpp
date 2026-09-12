@@ -13,6 +13,30 @@ void ShipBoss::Update()
 {
     Boss::Update();
 
+    bn::vector<bn::unique_ptr<Bullet>, 10>::iterator it = _activeBullets.begin();
+    while (it != _activeBullets.end())
+    {
+        bn::unique_ptr<Bullet> &bullet = *it;
+
+        // Update the bullet
+        bullet->Update();
+
+        // Check if it's off-screen and erase it, otherwise advance the iterator
+        if (bullet->IsOffScreen())
+        {
+            it = _activeBullets.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if (_life == 0)
+    {
+        return;
+    }
+
     switch (_state)
     {
     case state::IDLE:
@@ -28,29 +52,17 @@ void ShipBoss::Update()
         break;
     }
 
-    bn::vector<bn::unique_ptr<Bullet>, 10>::iterator it = _activeBullets.begin();
-    while (it != _activeBullets.end())
-    {
-        bn::unique_ptr<Bullet>& bullet = *it;
-
-        // Update the bullet
-        bullet->Update();
-
-        // Check if it's off-screen and erase it, otherwise advance the iterator
-        if (bullet->IsOffScreen())
-        {
-            it = _activeBullets.erase(it); 
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    HandleImmuneState();
 }
 
-void ShipBoss::TakeDamage(int damage){
-    Boss::TakeDamage(damage);
+void ShipBoss::TakeDamage(int damage)
+{
 
+    if (_immuneFrames == 0)
+    {
+        Boss::TakeDamage(damage);
+        _immuneFrames = 18;
+    }
 }
 
 void ShipBoss::TransitionToState(state newState)
@@ -147,6 +159,18 @@ void ShipBoss::Shoot()
     _activeBullets.push_back(bn::make_unique<Bullet>(
         bn::sprite_items::bullet.create_sprite(_position.x(), _position.y()),
         bulletDirection,
-        2
-        ));
+        2));
+}
+
+void ShipBoss::HandleImmuneState()
+{
+    if (_immuneFrames > 0)
+    {
+        _immuneFrames--;
+        _bossSprite.set_visible(_immuneFrames % 4 != 0);
+    }
+    else
+    {
+        _bossSprite.set_visible(true);
+    }
 }

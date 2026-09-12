@@ -23,6 +23,7 @@ private:
     void HandleIdleState();
     void HandleMoveState();
     void HandleAttackState();
+    void HandleImmuneState();
 
     void Shoot();
 
@@ -46,6 +47,7 @@ private:
     uint32_t _timeBetweenShots = 20;
     int _bulletsFired = 0;
     int _bulletsPerAttack = 7;
+    u_int32_t _immuneFrames = 0;
 
     bn::vector<bn::unique_ptr<Bullet>, 10> _activeBullets;
 };

@@ -16,4 +16,3 @@ if %errorlevel% neq 0 (
 		color 0a
 		echo Build succeeded.
 )
-pause

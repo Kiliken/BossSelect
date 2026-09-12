@@ -3,7 +3,7 @@
 Boss::Boss(bn::sprite_ptr sprite)
     :  _bossSprite(sprite)
 {
-    _hitbox = bn::fixed_rect{0,0,32,32};
+    _hitbox = bn::fixed_rect{0,0,16,16};
 }
 
 void Boss::Update()
@@ -12,6 +12,11 @@ void Boss::Update()
     _bossSprite.set_y(_position.y());
 
     _hitbox.set_position(_position.x(), _position.y());
+
+    if(_life == 0){
+        _bossSprite.set_visible(false);
+        return;
+    }
 }
 
 void Boss::SetState(state toSetTo)
