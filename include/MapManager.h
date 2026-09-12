@@ -28,6 +28,11 @@ public:
         const bn::fixed_point& previous_position
     ) const;
 
+    bn::fixed map_left() const;
+    bn::fixed map_top() const;
+    bn::fixed map_right() const;
+    bn::fixed map_bottom() const;
+
     MapID current_map() const
     {
         return _current_map;
